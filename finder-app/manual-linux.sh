@@ -12,7 +12,6 @@ BUSYBOX_VERSION=1_33_1
 FINDER_APP_DIR=$(realpath $(dirname $0))
 ARCH=arm64
 CROSS_COMPILE=aarch64-none-linux-gnu-
-CC_PATH=/home/ref1ovr/coursera/arm-cross-compiler/gcc-arm-10.2-2020.11-x86_64-aarch64-none-linux-gnu/
 
 if [ $# -lt 1 ]; then
 	echo "Using default directory ${OUTDIR} for output"
@@ -55,7 +54,7 @@ fi
 # TODO: Create necessary base directories:
 echo "--------- Creating Base Directories ---------"
 mkdir ${OUTDIR}/roofs && cd ${OUTDIR}/roofs
-mkdir -pv {bin,sbin,dev,etc,home,lib,lib64,proc,sys,temp,usr/{bin,sbin,lib},var/{log}}
+mkdir -pv {bin,sbin,dev,etc,home,lib,lib64,proc,sys,temp,usr/{bin,sbin,lib},var/log}
 
 cd "$OUTDIR"
 if [ ! -d "${OUTDIR}/busybox" ]; then
@@ -72,7 +71,6 @@ fi
 
 # TODO: Make and install busybox:
 echo "------ Building and Installing BusyBox ------"
-export PATH=$PATH:${CC_PATH}bin/
 make -j$(nproc) ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE}
 make CONFIG_PREFIX=${OUTDIR}/rootfs ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} install
 
@@ -83,10 +81,11 @@ ${CROSS_COMPILE}readelf -a bin/busybox | grep "Shared library"
 
 # TODO: Add library dependencies to rootfs:
 echo "-------- Adding Library Dependencies --------"
-cp ${CC_PATH}/aarch64-none-linux-gnu/libc/lib/ld-linux-aarch64.so.1 ${OUTDIR}/roofs/lib
-cp ${CC_PATH}/aarch64-none-linux-gnu/libc/lib64/libm.so.6 ${OUTDIR}/roofs/lib64
-cp ${CC_PATH}/aarch64-none-linux-gnu/libc/lib64/libresolv.so.2 ${OUTDIR}/roofs/lib64
-cp ${CC_PATH}/aarch64-none-linux-gnu/libc/lib64/libc.so.6 ${OUTDIR}/roofs/lib64
+CC_PATH=$(${CROSS_COMPILE}gcc -print-sysroot)
+cp -v ${CC_PATH}/lib/ld-linux-aarch64.so.1 ${OUTDIR}/roofs/lib
+cp -v ${CC_PATH}/lib64/libm.so.6 ${OUTDIR}/roofs/lib64
+cp -v ${CC_PATH}/lib64/libresolv.so.2 ${OUTDIR}/roofs/lib64
+cp -v ${CC_PATH}/lib64/libc.so.6 ${OUTDIR}/roofs/lib64
 
 # TODO: Make device nodes:
 echo "----------- Creating Device Nodes -----------"
