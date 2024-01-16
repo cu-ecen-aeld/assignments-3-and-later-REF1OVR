@@ -89,15 +89,12 @@ cp -v ${CC_PATH}/lib64/libc.so.6 ${OUTDIR}/roofs/lib64
 
 # TODO: Make device nodes:
 echo "----------- Creating Device Nodes -----------"
-cd ${OUTDIR}/rootfs/dev
-rm -rf ${OUTDIR}/roofs/dev/null			# Remove if exists
-rm -rf ${OUTDIR}/roofs/dev/console		# Remove if exists
-sudo mknod -m 666 null c 1 3
-sudo mknod -m 666 tty c 5 0
-sudo mknod -m 666 zero c 1 5
-sudo mknod -m 600 console c 5 1
-sudo mknod -m 666 random c 1 8
-sudo mknod -m 666 urandom c 1 9
+sudo mknod -m 666 ${OUTDIR}/roofs/dev/null c 1 3
+sudo mknod -m 666 ${OUTDIR}/roofs/dev/tty c 5 0
+sudo mknod -m 666 ${OUTDIR}/roofs/dev/zero c 1 5
+sudo mknod -m 600 ${OUTDIR}/roofs/dev/console c 5 1
+sudo mknod -m 666 ${OUTDIR}/roofs/dev/random c 1 8
+sudo mknod -m 666 ${OUTDIR}/roofs/dev/urandom c 1 9
 
 # TODO: Clean and build the writer utility:
 echo "-------- Clean and Build Writer Util --------"
