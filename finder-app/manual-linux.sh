@@ -112,14 +112,10 @@ make CROSS_COMPILE=${CROSS_COMPILE} all
 
 # TODO: Copy the finder related scripts and executables to the /home directory on the target rootfs:
 echo "---------- Copying Finder to rootfs ----------"
-cp -v writer ${OUTDIR}/rootfs/home/
-cp -v finder.sh ${OUTDIR}/rootfs/home/
-cp -v finder-test.sh ${OUTDIR}/rootfs/home/
-cp -v autorun-qemu.sh ${OUTDIR}/rootfs/home/
-cp -v start-qemu-app.sh ${OUTDIR}/rootfs/home/
-cp -v start-qemu-terminal.sh ${OUTDIR}/rootfs/home/
+cp writer finder.sh finder-test.sh autorun-qemu.sh start-qemu-app.sh start-qemu-terminal.sh ${OUTDIR}/rootfs/home/
 mkdir -p ${OUTDIR}/rootfs/home/conf
-cp -v ./conf/assignment.txt ${OUTDIR}/rootfs/home/conf/
+mkdir -p ${OUTDIR}/rootfs/conf
+cp -v ./conf/assignment.txt ${OUTDIR}/rootfs/conf/
 cp -v ./conf/username.txt ${OUTDIR}/rootfs/home/conf/
 
 
