@@ -86,10 +86,10 @@ ${CROSS_COMPILE}readelf -a bin/busybox | grep "Shared library"
 # TODO: Add library dependencies to rootfs:
 echo "-------- Adding Library Dependencies --------"
 CC_PATH=$(${CROSS_COMPILE}gcc -print-sysroot)
-cp -v ${CC_PATH}/lib/ld-linux-aarch64.so.1 ${OUTDIR}/roofs/lib
-cp -v ${CC_PATH}/lib64/libm.so.6 ${OUTDIR}/roofs/lib64
-cp -v ${CC_PATH}/lib64/libresolv.so.2 ${OUTDIR}/roofs/lib64
-cp -v ${CC_PATH}/lib64/libc.so.6 ${OUTDIR}/roofs/lib64
+cp -a -v ${CC_PATH}/lib/ld-linux-aarch64.so.1 ${OUTDIR}/roofs/lib
+cp -a -v ${CC_PATH}/lib64/libm.so.6 ${OUTDIR}/roofs/lib64
+cp -a -v ${CC_PATH}/lib64/libresolv.so.2 ${OUTDIR}/roofs/lib64
+cp -a -v ${CC_PATH}/lib64/libc.so.6 ${OUTDIR}/roofs/lib64
 
 
 # TODO: Make device nodes:
@@ -111,10 +111,15 @@ make CROSS_COMPILE=${CROSS_COMPILE} all
 
 # TODO: Copy the finder related scripts and executables to the /home directory on the target rootfs:
 echo "---------- Copying Finder to rootfs ----------"
-cp writer finder.sh finder-test.sh autorun-qemu.sh start-qemu-app.sh start-qemu-terminal.sh ${OUTDIR}/rootfs/home/
+cp -v ${FINDER_APP_DIR}/writer ${OUTDIR}/rootfs/home/
+cp -v ${FINDER_APP_DIR}/finder.sh ${OUTDIR}/rootfs/home/
+cp -v ${FINDER_APP_DIR}/finder-test.sh ${OUTDIR}/rootfs/home/
+cp -v ${FINDER_APP_DIR}/autorun-qemu.sh ${OUTDIR}/rootfs/home/
+cp -v ${FINDER_APP_DIR}/start-qemu-app.sh ${OUTDIR}/rootfs/home/
+cp -v ${FINDER_APP_DIR}/start-qemu-terminal.sh ${OUTDIR}/rootfs/home/
 mkdir -p ${OUTDIR}/rootfs/home/conf
-cp ./conf/assignment.txt ${OUTDIR}/rootfs/home/conf/
-cp ./conf/username.txt ${OUTDIR}/rootfs/home/conf/
+cp -v ./conf/assignment.txt ${OUTDIR}/rootfs/home/conf/
+cp -v ./conf/username.txt ${OUTDIR}/rootfs/home/conf/
 
 
 # TODO: Chown the root directory:
