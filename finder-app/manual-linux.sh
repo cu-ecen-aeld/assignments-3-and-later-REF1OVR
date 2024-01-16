@@ -44,6 +44,7 @@ if [ ! -e ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ]; then
 fi
 
 echo "Adding the Image in outdir"
+cp ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ${OUTDIR}/
 
 echo "Creating the staging directory for the root filesystem"
 cd "$OUTDIR"
@@ -55,7 +56,7 @@ fi
 
 # TODO: Create necessary base directories:
 echo "--------- Creating Base Directories ---------"
-mkdir ${OUTDIR}/roofs && cd ${OUTDIR}/roofs
+mkdir ${OUTDIR}/rootfs && cd ${OUTDIR}/rootfs
 mkdir -pv {bin,sbin,dev,etc,home,lib,lib64,proc,sys,temp,usr/{bin,sbin,lib},var/log}
 
 cd "$OUTDIR"
@@ -86,20 +87,20 @@ ${CROSS_COMPILE}readelf -a bin/busybox | grep "Shared library"
 # TODO: Add library dependencies to rootfs:
 echo "-------- Adding Library Dependencies --------"
 CC_PATH=$(${CROSS_COMPILE}gcc -print-sysroot)
-cp -a -v ${CC_PATH}/lib/ld-linux-aarch64.so.1 ${OUTDIR}/roofs/lib
-cp -a -v ${CC_PATH}/lib64/libm.so.6 ${OUTDIR}/roofs/lib64
-cp -a -v ${CC_PATH}/lib64/libresolv.so.2 ${OUTDIR}/roofs/lib64
-cp -a -v ${CC_PATH}/lib64/libc.so.6 ${OUTDIR}/roofs/lib64
+cp -v ${CC_PATH}/lib/ld-linux-aarch64.so.1 ${OUTDIR}/rootfs/lib/
+cp -v ${CC_PATH}/lib64/libm.so.6 ${OUTDIR}/rootfs/lib64/
+cp -v ${CC_PATH}/lib64/libresolv.so.2 ${OUTDIR}/rootfs/lib64/
+cp -v ${CC_PATH}/lib64/libc.so.6 ${OUTDIR}/rootfs/lib64/
 
 
 # TODO: Make device nodes:
 echo "----------- Creating Device Nodes -----------"
-sudo mknod -m 666 ${OUTDIR}/roofs/dev/null c 1 3
-sudo mknod -m 666 ${OUTDIR}/roofs/dev/tty c 5 0
-sudo mknod -m 666 ${OUTDIR}/roofs/dev/zero c 1 5
-sudo mknod -m 600 ${OUTDIR}/roofs/dev/console c 5 1
-sudo mknod -m 666 ${OUTDIR}/roofs/dev/random c 1 8
-sudo mknod -m 666 ${OUTDIR}/roofs/dev/urandom c 1 9
+sudo mknod -m 666 ${OUTDIR}/rootfs/dev/null c 1 3
+sudo mknod -m 666 ${OUTDIR}/rootfs/dev/tty c 5 0
+sudo mknod -m 666 ${OUTDIR}/rootfs/dev/zero c 1 5
+sudo mknod -m 600 ${OUTDIR}/rootfs/dev/console c 5 1
+sudo mknod -m 666 ${OUTDIR}/rootfs/dev/random c 1 8
+sudo mknod -m 666 ${OUTDIR}/rootfs/dev/urandom c 1 9
 
 
 # TODO: Clean and build the writer utility:
@@ -111,12 +112,12 @@ make CROSS_COMPILE=${CROSS_COMPILE} all
 
 # TODO: Copy the finder related scripts and executables to the /home directory on the target rootfs:
 echo "---------- Copying Finder to rootfs ----------"
-cp -v ${FINDER_APP_DIR}/writer ${OUTDIR}/rootfs/home/
-cp -v ${FINDER_APP_DIR}/finder.sh ${OUTDIR}/rootfs/home/
-cp -v ${FINDER_APP_DIR}/finder-test.sh ${OUTDIR}/rootfs/home/
-cp -v ${FINDER_APP_DIR}/autorun-qemu.sh ${OUTDIR}/rootfs/home/
-cp -v ${FINDER_APP_DIR}/start-qemu-app.sh ${OUTDIR}/rootfs/home/
-cp -v ${FINDER_APP_DIR}/start-qemu-terminal.sh ${OUTDIR}/rootfs/home/
+cp -v writer ${OUTDIR}/rootfs/home/
+cp -v finder.sh ${OUTDIR}/rootfs/home/
+cp -v finder-test.sh ${OUTDIR}/rootfs/home/
+cp -v autorun-qemu.sh ${OUTDIR}/rootfs/home/
+cp -v start-qemu-app.sh ${OUTDIR}/rootfs/home/
+cp -v start-qemu-terminal.sh ${OUTDIR}/rootfs/home/
 mkdir -p ${OUTDIR}/rootfs/home/conf
 cp -v ./conf/assignment.txt ${OUTDIR}/rootfs/home/conf/
 cp -v ./conf/username.txt ${OUTDIR}/rootfs/home/conf/
@@ -124,12 +125,12 @@ cp -v ./conf/username.txt ${OUTDIR}/rootfs/home/conf/
 
 # TODO: Chown the root directory:
 echo "---------- Chown the root directory ----------"
-sudo chown -R root:root ${OUTDIR}/roofs
+sudo chown -R root:root ${OUTDIR}/rootfs
 
 
 # TODO: Create initramfs.cpio.gz:
 echo "------------- Creating initramfs -------------"
 sudo apt-get install -y cpio
-cd "${OUTDIR}/roofs"
+cd "${OUTDIR}/rootfs"
 find . | cpio -H newc -ov --owner root:root > ${OUTDIR}/initramfs.cpio
 gzip -f ${OUTDIR}/initramfs.cpio
